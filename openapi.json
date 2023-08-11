@@ -1,5 +1,5 @@
 {
-    "openapi": "3.1.0",
+    "openapi": "3.0.2",
     "info": {
         "version": "1.0.0",
         "title": "GitHub Issues to Markdown",
@@ -10,6 +10,11 @@
     "security": [
         {
             "basicAuth": []
+        }
+    ],
+    "servers": [
+        {
+            "url": "https://application-a6.15v354wgljnn.us-east.codeengine.appdomain.cloud"
         }
     ],
     "paths": {
@@ -27,6 +32,51 @@
                                 "items": {
                                     "$ref": "#/components/schemas/issue"
                                 }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "fileContent": {
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Bad request",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/markdown_single": {
+            "post": {
+                "summary": "Create a Markdown file from issue",
+                "description": "Create a Markdown file from issue",
+                "operationId": "markdown",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/issue"
                             }
                         }
                     }

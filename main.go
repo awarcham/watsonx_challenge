@@ -82,6 +82,40 @@ func createServerMux() *http.ServeMux {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(outBin))
 	}))
+	ret.Handle("/markdown_single", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var outFile strings.Builder
+		outFile.WriteString("# Release Notes")
+
+		method := r.Method
+		if method != "POST" {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("Only POST requests are allowed to this endpoint"))
+			return
+		}
+		var issue GitHubIssue
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("Request body must not be empty"))
+			return
+		}
+		log.Printf("Request body: %v", string(body))
+		err = json.Unmarshal(body, &issue)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(fmt.Sprintf("Error reading request body: %v", err)))
+			log.Printf("%v", err)
+			return
+		}
+		issueTemplate.Execute(&outFile, issue)
+		out := outFile.String()
+		var outBin string
+		for _, c := range out {
+			outBin = fmt.Sprintf("%s%b", outBin, c)
+		}
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(outBin))
+	}))
 	return ret
 }
 
