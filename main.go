@@ -63,10 +63,12 @@ func createServerMux() *http.ServeMux {
 			w.Write([]byte("Request body must not be empty"))
 			return
 		}
+		log.Printf("Request body: %v", string(body))
 		err = json.Unmarshal(body, &issues)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte(fmt.Sprintf("Error reading request body: %v", err)))
+			log.Printf("%v", err)
 			return
 		}
 		for issue := range issues {
